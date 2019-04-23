@@ -3,17 +3,17 @@ from collections import defaultdict
 
 class Matcher:
 
-    def __init__(self, men, women):
+    def __init__(self, mentors, mentees):
         '''
         Constructs a Matcher instance.
 
-        Takes a dict of men's spousal preferences, `men`,
-        and a dict of women's spousal preferences, `women`.
+        Takes a dict of mentors' spousal preferences, `mentors`,
+        and a dict of mentees' spousal preferences, `mentees`.
 
         '''
-        self.M = men
-        self.W = women
-        self.wives = {}
+        self.M = mentors
+        self.W = mentees
+        self.mentees = {}
         self.pairs = []
 
         # we index spousal preferences at initialization
@@ -21,69 +21,97 @@ class Matcher:
         self.mrank = defaultdict(dict)  # `mrank[m][w]` is m's ranking of w
         self.wrank = defaultdict(dict)  # `wrank[w][m]` is w's ranking of m
 
-        for m, prefs in men.items():
+        # place rank values
+        for m, prefs in mentors.items():
             for i, w in enumerate(prefs):
                 self.mrank[m][w] = i
 
-        for w, prefs in women.items():
+        for w, prefs in mentees.items():
             for i, m in enumerate(prefs):
                 self.wrank[w][m] = i
 
     def __call__(self):
         return self.match()
 
-    def prefers(self, w, m, h):
-        return True
+    def prefers(self, w, m, c):
         '''Test whether w prefers m over h.'''
-        return self.wrank[w][m] < self.wrank[w][h]
+        mentee_pref = self.wrank[w]
+
+        if m not in mentee_pref:
+            return False
+
+        if c not in mentee_pref:
+            return False
+
+        return mentee_pref[m] < mentee_pref[c]
 
     def after(self, m, w):
-        '''Return the woman favored by m after w.'''
-        i = self.mrank[m][w] + 1  # index of woman following w in list of prefs
+        print("after:", w)
+        '''Return the mentee favored by m after w.'''
+        i = self.mrank[m][w] + 1  # index of mentee following w in list of prefs
+
+        # print(i)
+        #
+        # print(self.M[m][w])
+        #
+        if i >= len(self.M[m]):
+            print("not found ", i)
+            return None
+
         return self.M[m][i]
 
-    def match(self, men=None, next=None, wives=None):
+    def match(self, mentors=None, next=None, mentees=None):
         '''
-        Try to match all men with their next preferred spouse.
+        Try to match all mentors with their next preferred spouse.
 
         '''
-        if men is None:
-            men = self.M.keys()  # get the complete list of men
+        if mentors is None:
+            mentors = self.M.keys()  # get the complete list of men
         if next is None:
-            # if not defined, map each man to their first preference
+            # if not defined, map each mentor to their first preference
             next = dict((m, rank[0]) for m, rank in self.M.items())
-        if wives is None:
-            wives = {}  # mapping from women to current spouse
-        if not len(men):
-            self.pairs = [(h, w) for w, h in wives.items()]
-            self.wives = wives
-            return wives
-        m, men = list(men)[0], list(men)[1:]
-        w = next[m]  # next woman for m to propose to
-        next[m] = self.after(m, w)  # woman after w in m's list of prefs
-        if w in wives:
-            h = wives[w]  # current husband
-            if self.prefers(w, m, h):
-                men.append(h)  # husband becomes available again
-                wives[w] = m  # w becomes wife of m
+        if mentees is None:
+            mentees = {}  # mapping from mentees to current spouse
+        if not len(mentors):
+            self.pairs = [(h, w) for w, h in mentees.items()]
+            self.mentees = mentees
+            return mentees
+        m, mentors = list(mentors)[0], list(mentors)[1:]
+        print("current mentor: ", m)
+        w = next[m]  # next mentee for m to propose to
+        print("current mentee: ", w)
+        if w is not None:
+            next[m] = self.after(m, w)  # mentee after w in m's list of prefs
+            if next[m] is not None:
+                print("next mentee for " + m + " to propose: " + next[m])
+
+            if w in mentees:
+                c = mentees[w]  # current mentor
+                if self.prefers(w, m, c):
+                    mentors.append(c)  # current mentor becomes available again
+                    mentees[w] = m  # w becomes mentee of m
+                # todo there may be other conditions here, such as "if this is man's only choice"
+                else:
+                    mentors.append(m)  # m remains unmatched
             else:
-                men.append(m)  # m remains unmarried
+                mentees[w] = m  # w becomes mentee of m
         else:
-            wives[w] = m  # w becomes wife of m
-        return self.match(men, next, wives)
+            print("w is none.", m, mentors)
+
+        return self.match(mentors, next, mentees)
 
     def is_stable(self, wives=None, verbose=False):
         if wives is None:
-            wives = self.wives
+            wives = self.mentees
         for w, m in wives.items():
             i = self.M[m].index(w)
             preferred = self.M[m][:i]
             for p in preferred:
                 h = wives[p]
                 if self.W[p].index(m) < self.W[p].index(h):
-                    msg = "{}'s marriage to {} is unstable: " + \
+                    msg = "{}'s matching to {} is unstable: " + \
                           "{} prefers {} over {} and {} prefers " + \
-                          "{} over her current husband {}"
+                          "{} over her current mentor {}"
                     if verbose:
                         print
                         msg.format(m, w, m, p, w, p, m, h)
