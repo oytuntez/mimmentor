@@ -1,17 +1,22 @@
 # the men and their list of ordered spousal preferences
 from match import Matcher
 
-M = dict((m, prefs.split(', ')) for [m, prefs] in (line.rstrip().split(': ')
+MR = dict((m, prefs.split(', ')) for [m, prefs] in (line.rstrip().split(': ')
                                 for line in open('mentors.txt')))
 
 # the women and their list of ordered spousal preferences
-W = dict((m, prefs.split(', ')) for [m, prefs] in (line.rstrip().split(': ')
+ME = dict((m, prefs.split(', ')) for [m, prefs] in (line.rstrip().split(': ')
                                 for line in open('mentees.txt')))
 
 
 # initialize Matcher with preference lists for both men and women
-match = Matcher(M, W)
+match = Matcher(MR, ME)
 
-wives = match()
+mentees = match()
 
-print(wives)
+print("Mentors:")
+print(MR)
+print("Mentee:")
+print(ME)
+print("Result:")
+print(mentees)

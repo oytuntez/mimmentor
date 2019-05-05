@@ -1,0 +1,38 @@
+Tools:
+- Name Form
+- Selection Form
+
+
+
+
+# Pre-event
+- Prefill Voting Form with sorted IDs (without name)
+- Clone the question for 3 mentors 3 mentees = 6 questions with dropdown style
+
+# Check-in
+- Give an ID to the guest. IDs are sorted (voting form has all IDs prefilled)
+- Guest enters Name and ID to a Google Form.
+- Team member takes a photo of the person with ID in front of background
+
+# Pre-voting
+- Team members uploads all photos to Google Photos
+- Take a screenshot of GPhotos grid
+- Upload to Voting Google Form
+
+# Entry
+People use Google Forms to enter their selections. Possible forms: "124", "2344 Name"
+
+# Collection
+Google Forms forwards the entry to Google Sheets. Possible forms: "124", "2344 Name"
+
+# Parse - Manual
+Parse the numbers in each column, if mixed with text, and paste back to Google Sheet columns.
+
+# Analysis - Data Intake
+Download Google Sheets as CSV. Transform into this form:
+{PersonID}: [{selectedID}]
+
+Put the data in mentors.txt and mentee.txt
+
+# Analysis - Run
+Run two-sided.py

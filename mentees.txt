@@ -1,10 +1,3 @@
-abi: bob, fred, jon
-bea: bob, abe, col
-cath: fred
-dee: fred, jon, col
-eve: jon, hal
-fay: bob, abe, ed
-gay: jon, gav
-hope: gav
-ivy: ian, col, hal
-jan: ed, hal
+101: 102, 104
+103: 104, 102
+104: 102
