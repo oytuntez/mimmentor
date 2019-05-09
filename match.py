@@ -46,7 +46,7 @@ class Matcher:
         return mentee_pref[m] < mentee_pref[c]
 
     def after(self, m, w):
-        print("after:", w)
+        # print("after:", w)
         '''Return the mentee favored by m after w.'''
         i = self.mrank[m][w] + 1  # index of mentee following w in list of prefs
 
@@ -55,7 +55,7 @@ class Matcher:
         # print(self.M[m][w])
         #
         if i >= len(self.M[m]):
-            print("not found ", i)
+            # print("not found ", i)
             return None
 
         return self.M[m][i]
@@ -77,13 +77,13 @@ class Matcher:
             self.mentees = mentees
             return mentees
         m, mentors = list(mentors)[0], list(mentors)[1:]
-        print("current mentor: ", m)
+        # print("current mentor: ", m)
         w = next[m]  # next mentee for m to propose to
-        print("current mentee: ", w)
+        # print("current mentee: ", w)
         if w is not None:
             next[m] = self.after(m, w)  # mentee after w in m's list of prefs
-            if next[m] is not None:
-                print("next mentee for " + m + " to propose: " + next[m])
+            # if next[m] is not None:
+            #     print("next mentee for " + m + " to propose: " + next[m])
 
             if w in mentees:
                 c = mentees[w]  # current mentor
